@@ -1,0 +1,59 @@
+{
+  "name": "zeta_project_order_items",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "timeout_seconds": 0,
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "ingestao_bronze",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/otaviopassarelli5@gmail.com/BRONZE_INGEST",
+        "base_parameters": {
+          "caminho_arquivo": "/Volumes/zeta_project/bronze/arquivos/",
+          "tabela_bronze": "zeta_project.bronze.orders_items",
+          "flag_limpeza": "0",
+          "tipo_arquivo": "csv",
+          "data_ref": "",
+          "nome_arquivo": "order_items.csv"
+        },
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {}
+    },
+    {
+      "task_key": "trata_campos",
+      "depends_on": [
+        {
+          "task_key": "ingestao_bronze"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/otaviopassarelli5@gmail.com/SILVER_TRATAM",
+        "base_parameters": {
+          "col_inteiro": "quantity",
+          "col_decimal": "unit_price,discount_amount",
+          "col_timestamp": "",
+          "tabela_origem": "zeta_project.bronze.orders_items",
+          "tabela_destino": "zeta_project.silver.orders_items",
+          "col_texto": "",
+          "chave": "order_id,product_id"
+        },
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {}
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}
